@@ -154,27 +154,27 @@ Setting up Drizzle and Turso is a breeze:
 Inside your Next.js App Router project set up `drizzle.config.ts`. This file will serve as a binding between your schema and Drizzle Kit, a migration and data explorer suite.
 
 ```ts
-import "dotenv/config";
+import 'dotenv/config';
 
-import type { Config } from "drizzle-kit";
+import type { Config } from 'drizzle-kit';
 
 export default {
-  out: "./drizzle",
-  schema: "./schema.ts",
-  strict: true,
-  verbose: true,
-  ...(process.env.DATABASE_AUTH_TOKEN && process.env.NODE_ENV == "production"
-    ? {
-        driver: "turso",
-        dbCredentials: {
-          url: process.env.DATABASE_URL ?? "",
-          authToken: process.env.DATABASE_AUTH_TOKEN,
-        },
-      }
-    : {
-        driver: "libsql",
-        dbCredentials: { url: process.env.DATABASE_URL ?? "" },
-      }),
+	out: './drizzle',
+	schema: './schema.ts',
+	strict: true,
+	verbose: true,
+	...(process.env.DATABASE_AUTH_TOKEN && process.env.NODE_ENV == 'production'
+		? {
+				driver: 'turso',
+				dbCredentials: {
+					url: process.env.DATABASE_URL ?? '',
+					authToken: process.env.DATABASE_AUTH_TOKEN
+				}
+		  }
+		: {
+				driver: 'libsql',
+				dbCredentials: { url: process.env.DATABASE_URL ?? '' }
+		  })
 } satisfies Config;
 ```
 
@@ -290,101 +290,94 @@ export async function createWorkout(prevState: unknown, formData: FormData) {
 Finally I'm going to demonstrate how forms can be juiced with autocomplete and fancier interactions than the standard form field components browsers provide. In this component I'm having the server action passed from above, but using `<input type="hidden" />` to copy over a controlled field value - something routine in Django type stacks when augmenting forms with interactivity and high fidelity UI. You can mix and match controlled and uncontrolled inputs - ultimately just ensuring data ends up in `FormData` since that is what is sent to the server via the Server Action. Unfortunately `FormData` API is not as expressive as raw JSON - a slight downside to what one might be used to in GraphQL or with tRPC. (Hint: `z.coerce` is your friend here!).
 
 ```tsx
-"use client";
+'use client';
 
-import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
-import { useDebounce } from "usehooks-ts";
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
+import { useDebounce } from 'usehooks-ts';
 
-import { Primary } from "~/components/button-";
-import { type createWorkout as createWorkoutAction } from "~/db/actions";
-import { getNumberValue } from "~/utils/workouts";
+import { Primary } from '~/components/button-';
+import { type createWorkout as createWorkoutAction } from '~/db/actions';
+import { getNumberValue } from '~/utils/workouts';
 
-import { Autocomplete, type Item } from "./auto-complete";
+import { Autocomplete, type Item } from './auto-complete';
 
 export function CreateWorkout({
-  createWorkout,
-  workoutDescriptions,
+	createWorkout,
+	workoutDescriptions
 }: {
-  createWorkout: typeof createWorkoutAction;
-  workoutDescriptions: Item[];
+	createWorkout: typeof createWorkoutAction;
+	workoutDescriptions: Item[];
 }) {
-  const [message, action] = useFormState(createWorkout, null);
-  return (
-    <form action={action}>
-      <CreateWorkoutFieldset workoutDescriptions={workoutDescriptions} />
-      {message}
-    </form>
-  );
+	const [message, action] = useFormState(createWorkout, null);
+	return (
+		<form action={action}>
+			<CreateWorkoutFieldset workoutDescriptions={workoutDescriptions} />
+			{message}
+		</form>
+	);
 }
 
-export function CreateWorkoutFieldset({
-  workoutDescriptions
-}: {
-  workoutDescriptions: Item[];
-}) {
-  const { pending } = useFormStatus();
-  const [description, setDescription] = useState("");
-  const [value, setValue] = useState("");
-  const numberValue = getNumberValue(value);
-  const valueType: "empty" | "value" | "time" =
-    value.trim() === "" ? "empty" : numberValue.isTime ? "time" : "value";
-  const debouncedValueType = useDebounce(valueType, 500);
-  return (
-    <fieldset
-      className="flex w-full flex-wrap items-end gap-4"
-      disabled={pending}
-    >
-      <input type="hidden" name="description" value={description} />
-      <div className="grow-[5] basis-[180px]">
-        <Autocomplete
-          items={workoutDescriptions}
-          value={{ description }}
-          onChange={(item) => {
-            setDescription(item.description);
-          }}
-        />
-      </div>
-      <div className="grow-[3] basis-[100px]">
-        <label className="inline-flex min-w-0 flex-col">
-          <AnimatePresence mode="popLayout">
-            <motion.span
-              className="block text-left text-sm font-medium leading-6 text-gray-400"
-              layout
-              transition={{ duration: 0.25 }}
-              initial={{ opacity: 0, x: 24 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 24 }}
-              key={debouncedValueType}
-            >
-              {debouncedValueType === "empty" ? "Time / Unit" : null}
-              {debouncedValueType === "time" ? "Time" : null}
-              {debouncedValueType === "value" ? "Weight / Reps" : null}
-            </motion.span>
-          </AnimatePresence>
-          <input
-            className="w-full rounded-md border border-neutral-600 bg-transparent px-3 py-1.5 placeholder:text-neutral-700"
-            name="value"
-            value={value}
-            onChange={(event) => setValue(event.target.value)}
-          />
-        </label>
-      </div>
-      <div className="relative grow-[1] basis-[80px]">
-        <Primary
-          type="submit"
-          className="z-30 w-full"
-          disabled={value.trim() === "" || description.trim() === ""}
-        >
-          <span className="@container font-bold">
-            <span className="@sm:hidden">Save</span>
-            <span className="@sm:inline hidden">Record New Workout</span>
-          </span>
-        </Primary>
-      </div>
-    </fieldset>
-  );
+export function CreateWorkoutFieldset({ workoutDescriptions }: { workoutDescriptions: Item[] }) {
+	const { pending } = useFormStatus();
+	const [description, setDescription] = useState('');
+	const [value, setValue] = useState('');
+	const numberValue = getNumberValue(value);
+	const valueType: 'empty' | 'value' | 'time' =
+		value.trim() === '' ? 'empty' : numberValue.isTime ? 'time' : 'value';
+	const debouncedValueType = useDebounce(valueType, 500);
+	return (
+		<fieldset className="flex w-full flex-wrap items-end gap-4" disabled={pending}>
+			<input type="hidden" name="description" value={description} />
+			<div className="grow-[5] basis-[180px]">
+				<Autocomplete
+					items={workoutDescriptions}
+					value={{ description }}
+					onChange={(item) => {
+						setDescription(item.description);
+					}}
+				/>
+			</div>
+			<div className="grow-[3] basis-[100px]">
+				<label className="inline-flex min-w-0 flex-col">
+					<AnimatePresence mode="popLayout">
+						<motion.span
+							className="block text-left text-sm font-medium leading-6 text-gray-400"
+							layout
+							transition={{ duration: 0.25 }}
+							initial={{ opacity: 0, x: 24 }}
+							animate={{ opacity: 1, x: 0 }}
+							exit={{ opacity: 0, x: 24 }}
+							key={debouncedValueType}
+						>
+							{debouncedValueType === 'empty' ? 'Time / Unit' : null}
+							{debouncedValueType === 'time' ? 'Time' : null}
+							{debouncedValueType === 'value' ? 'Weight / Reps' : null}
+						</motion.span>
+					</AnimatePresence>
+					<input
+						className="w-full rounded-md border border-neutral-600 bg-transparent px-3 py-1.5 placeholder:text-neutral-700"
+						name="value"
+						value={value}
+						onChange={(event) => setValue(event.target.value)}
+					/>
+				</label>
+			</div>
+			<div className="relative grow-[1] basis-[80px]">
+				<Primary
+					type="submit"
+					className="z-30 w-full"
+					disabled={value.trim() === '' || description.trim() === ''}
+				>
+					<span className="@container font-bold">
+						<span className="@sm:hidden">Save</span>
+						<span className="@sm:inline hidden">Record New Workout</span>
+					</span>
+				</Primary>
+			</div>
+		</fieldset>
+	);
 }
 ```
 
