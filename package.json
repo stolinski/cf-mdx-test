@@ -52,5 +52,6 @@
 		"@sveltejs/adapter-cloudflare": "^2.3.4",
 		"shiki": "^0.14.7",
 		"zod": "^3.25.76"
-	}
+	},
+	"packageManager": "pnpm@9.15.9"
 }
